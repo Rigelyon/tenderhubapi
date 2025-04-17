@@ -1,6 +1,6 @@
 # TenderHub API
 
-Welcome to TenderHub API. This repository is a backend for a TenderHub website
+Welcome to TenderHub API. This repository is a backend for TenderHub website
 
 
 ## Prerequisites
@@ -12,7 +12,7 @@ Welcome to TenderHub API. This repository is a backend for a TenderHub website
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/tenderhubapi.git
+    git clone https://github.com/Rigelyon/tenderhubapi.git
     cd tenderhubapi
     ```
 
