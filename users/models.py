@@ -5,6 +5,7 @@ class User(AbstractUser):
     """
     Custom user model that extends the AbstractUser model.
     """
+    username = models.CharField(max_length=150, unique=True, default='default_username')
     profile_picture = models.ImageField(upload_to='profile_pics', blank=True, null=True)
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=255, blank=True)
@@ -12,6 +13,8 @@ class User(AbstractUser):
 
     is_client = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
+
+    password = models.CharField(max_length=128, default='default_password')
 
     class Meta:
         verbose_name = "User"

@@ -31,3 +31,5 @@ staticfiles/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+*/migrations/

@@ -18,7 +18,12 @@ class Tender(models.Model):
     )
 
     tender_id = models.BigAutoField(primary_key=True)
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tenders')
+    client = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='tenders', 
+        default=1
+    )
     title = models.CharField(verbose_name="Title", max_length=255)
     description = models.TextField(verbose_name="Description")
     attachment = models.FileField(upload_to='tender_attachments/', blank=True, null=True)
