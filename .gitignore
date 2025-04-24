@@ -16,6 +16,7 @@ staticfiles/
 
 # Environments
 .env
+.venv/
 *.env
 
 # IDEs and Editors
