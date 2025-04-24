@@ -19,7 +19,7 @@ Welcome to TenderHub API. This repository is a backend for TenderHub website
 2. Create and activate a virtual environment:
     ```bash
     python -m venv .env
-    source .env/bin/activate  # On Windows use `.env\Scripts\activate`
+    source .env/bin/activate  # On Windows use `.env\Scripts\activate` without  source
     ```
 
 3. Install dependencies:
@@ -30,9 +30,10 @@ Welcome to TenderHub API. This repository is a backend for TenderHub website
 4. Set up environment variables:
     Create a `.env` file in the root directory and configure the required variables:
     ```
-    SECRET_KEY=your_django_secret_key
-    DEBUG=True
-    DATABASE_URL=your_database_connection_string
+    SECRET_KEY = 'your_django_secret_key'
+    DEBUG = True
+    DATABASE_URL = 'your_database_connection_string'
+    ALLOWED_HOSTS = 'your_allowed_hosts'
     ```
 
 5. Apply database migrations:
