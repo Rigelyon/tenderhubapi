@@ -19,8 +19,13 @@ Welcome to TenderHub API. This repository is a backend for TenderHub website
 
 2. Create and activate a virtual environment:
     ```bash
-    python -m venv .env
-    source .env/bin/activate  # On Windows use `.env\Scripts\activate` without  source
+    python -m venv .venv
+
+    # Linux
+    source .env/bin/activate
+
+    # Windows
+    .venv\Scripts\activate
     ```
 
 3. Install dependencies:
