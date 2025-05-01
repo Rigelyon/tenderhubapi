@@ -64,3 +64,86 @@
 ### Project Activities
 - `GET /api/v1/projects/{id}/activities/` - List all activities for a project
 - `POST /api/v1/projects/{id}/activities/` - Add new activity/comment to project
+
+## Testing
+
+The project uses pytest for testing. To run the tests:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=.
+
+# Generate HTML coverage report
+pytest --cov=. --cov-report=html
+```
+
+### Test Structure
+
+- `tender/tests.py` - Tests for tender-related functionality
+  - List tenders
+  - Create tender
+  - Place bid
+  - Accept bid
+  - Comment on tender
+
+- `users/tests.py` - Tests for user authentication and profiles
+  - User registration (client/vendor)
+  - Profile management
+  - Authentication
+  - Authorization
+
+- `project_activity/tests.py` - Tests for project activities
+  - List activities
+  - Create activity
+  - Project lifecycle events
+  - File attachments
+
+### Test Configuration
+
+The project uses pytest.ini for configuration:
+```ini
+[pytest]
+DJANGO_SETTINGS_MODULE = tenderhubapi.settings
+python_files = tests.py test_*.py *_tests.py
+addopts = --cov=. --cov-report=html
+```
+
+### Writing Tests
+
+Example of writing a test:
+```python
+@pytest.mark.django_db
+class TestFeature:
+    def test_specific_functionality(self, api_client):
+        # Arrange
+        data = {...}
+        
+        # Act
+        response = api_client.post('/api/endpoint', data)
+        
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+```
+
+### Running Specific Tests
+
+```bash
+# Run tests in a specific file
+pytest tender/tests.py
+
+# Run tests matching a pattern
+pytest -k "test_create"
+
+# Run with detailed output
+pytest -v
+```
+
+### Test Coverage
+
+Coverage reports are generated in HTML format and can be found in the `htmlcov` directory after running:
+```bash
+pytest --cov=. --cov-report=html
+```

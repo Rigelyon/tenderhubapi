@@ -5,8 +5,9 @@ Welcome to TenderHub API. This repository is a backend for TenderHub website
 
 ## Prerequisites
 
-- [Python](https://www.python.org/) (v3.12.9 or higher)
-- [pip](https://pip.pypa.io/en/stable/)
+- Python (v3.12.9 or higher)
+- PostgreSQL (v12 or higher)
+- pip
 
 ## Installation
 
@@ -27,21 +28,45 @@ Welcome to TenderHub API. This repository is a backend for TenderHub website
     pip install -r requirements.txt
     ```
 
-4. Set up environment variables:
-    Create a `.env` file in the root directory and configure the required variables:
-    ```
-    SECRET_KEY = 'your_django_secret_key'
-    DEBUG = True
-    DATABASE_URL = 'your_database_connection_string'
-    ALLOWED_HOSTS = 'your_allowed_hosts'
+4. Set up PostgreSQL:
+    ```bash
+    # Create database
+    psql -U postgres
+    CREATE DATABASE tenderhub;
     ```
 
-5. Apply database migrations:
+5. Configure environment variables:
+    ```bash
+    cp .env.example .env
+    ```
+    Update the `.env` file with your configuration:
+    ```
+    SECRET_KEY='your_django_secret_key'
+    DEBUG=True
+    ALLOWED_HOSTS=127.0.0.1,localhost
+
+    # Database settings
+    DB_NAME=tenderhub
+    DB_USER=your_db_user
+    DB_PASSWORD=your_db_password
+    DB_HOST=localhost
+    DB_PORT=5432
+
+    # CORS settings
+    CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+    ```
+
+6. Apply database migrations:
     ```bash
     python manage.py migrate
     ```
 
-6. Start the development server:
+7. Create a superuser:
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+8. Start the development server:
     ```bash
     python manage.py runserver
     ```
