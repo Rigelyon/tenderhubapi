@@ -51,7 +51,13 @@ class Tender(models.Model):
     def top_bid(self):
         top_bid = self.bids.order_by('amount').first()
         return top_bid
-    
+        
+    @property
+    def vendor(self):
+        """Returns the vendor of the accepted bid, if any."""
+        accepted_bid = self.bids.filter(status='accepted').first()
+        return accepted_bid.vendor if accepted_bid else None
+
 class Comment(models.Model):
     comment_id = models.BigAutoField(primary_key=True)
     tender = models.ForeignKey(Tender, on_delete=models.CASCADE, related_name='comments')

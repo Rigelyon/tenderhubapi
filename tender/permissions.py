@@ -29,6 +29,10 @@ class IsVendorOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         
+        # Allow POST for place_bid action if user is vendor
+        if view.action == 'place_bid':
+            return request.user.is_authenticated and request.user.is_vendor
+            
         # Write permissions are only allowed to vendors
         return request.user.is_authenticated and request.user.is_vendor
     

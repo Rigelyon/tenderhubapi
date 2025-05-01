@@ -55,7 +55,7 @@ class TenderViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, IsVendorOrReadOnly])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def place_bid(self, request, pk=None):
         tender = self.get_object()
         
@@ -68,8 +68,7 @@ class TenderViewSet(viewsets.ModelViewSet):
             return Response({"error": "Bids can only be placed on open tenders"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if vendor already placed a bid
-        existing_bid = Bid.objects.filter(tender=tender, vendor=request.user).first()
-        if existing_bid:
+        if Bid.objects.filter(tender=tender, vendor=request.user).exists():
             return Response({"error": "You already placed a bid on this tender"}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = BidSerializer(data=request.data)
