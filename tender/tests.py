@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 from faker import Faker
-from .models import Tender, Tag, Bid
+from .models import Tender, Tag, Bid, Category
 from users.models import User
 
 fake = Faker()
@@ -31,6 +31,15 @@ def vendor_user():
     return user
 
 @pytest.fixture
+def admin_user():
+    user = User.objects.create_superuser(
+        username=fake.user_name(),
+        password=fake.password(),
+        email=fake.email()
+    )
+    return user
+
+@pytest.fixture
 def tender(client_user):
     return Tender.objects.create(
         client=client_user,
@@ -53,6 +62,13 @@ def tender_with_bid(tender, vendor_user):
     )
     return tender, bid
 
+@pytest.fixture
+def category():
+    return Category.objects.create(
+        name=fake.word(),
+        description=fake.text()
+    )
+
 @pytest.mark.django_db
 class TestTenderEndpoints:
     def test_list_tenders(self, api_client, client_user):
@@ -60,7 +76,7 @@ class TestTenderEndpoints:
         response = api_client.get(reverse('tender-list'))
         assert response.status_code == status.HTTP_200_OK
 
-    def test_create_tender(self, api_client, client_user):
+    def test_create_tender(self, api_client, client_user, category):
         api_client.force_authenticate(user=client_user)
         data = {
             'title': fake.sentence(),
@@ -68,10 +84,12 @@ class TestTenderEndpoints:
             'max_duration': 30,
             'min_budget': 1000,
             'max_budget': 5000,
-            'deadline': fake.future_date().isoformat()
+            'deadline': fake.future_date().isoformat(),
+            'category_id': category.id
         }
         response = api_client.post(reverse('tender-list'), data)
         assert response.status_code == status.HTTP_201_CREATED
+        assert Tender.objects.filter(title=data['title'], category=category).exists()
 
     def test_place_bid(self, api_client, vendor_user, tender):
         api_client.force_authenticate(user=vendor_user)
@@ -146,3 +164,34 @@ class TestTenderEndpoints:
             data
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+@pytest.mark.django_db
+class TestCategoryEndpoints:
+    def test_list_categories(self, api_client, admin_user, category):
+        api_client.force_authenticate(user=admin_user)
+        response = api_client.get(reverse('category-list'))
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) > 0
+
+    def test_create_category(self, api_client, admin_user):
+        api_client.force_authenticate(user=admin_user)
+        data = {
+            "name": fake.word(),
+            "description": fake.text()
+        }
+        response = api_client.post(reverse('category-list'), data)
+        assert response.status_code == status.HTTP_201_CREATED
+        assert Category.objects.filter(name=data['name']).exists()
+
+    def test_non_admin_cannot_create_category(self, api_client):
+        user = User.objects.create_user(
+            username=fake.user_name(),
+            password=fake.password()
+        )
+        api_client.force_authenticate(user=user)
+        data = {
+            "name": fake.word(),
+            "description": fake.text()
+        }
+        response = api_client.post(reverse('category-list'), data)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
