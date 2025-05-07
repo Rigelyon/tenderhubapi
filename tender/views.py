@@ -6,10 +6,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-from .models import Tender, Comment, Bid, Project, Tag
+from .models import Tender, Comment, Bid, Project, Tag, Category
 from .serializers import (
     TenderSerializer, TenderDetailSerializer, CommentSerializer, 
-    BidSerializer, ProjectSerializer, TagSerializer
+    BidSerializer, ProjectSerializer, TagSerializer, CategorySerializer
 )
 from project_activity.models import ProjectActivity
 from project_activity.serializers import ProjectActivitySerializer
@@ -286,3 +286,8 @@ class ProjectActivityViewSet(viewsets.ModelViewSet):
             raise permissions.PermissionDenied("You're not part of this project")
         
         serializer.save(project=project, user=self.request.user)
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]

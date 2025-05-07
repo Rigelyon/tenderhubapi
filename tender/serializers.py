@@ -1,12 +1,17 @@
 from rest_framework import serializers
 
 from project_activity.models import ProjectActivity
-from .models import Bid, Project, Tag, Tender, Comment
+from .models import Bid, Project, Tag, Tender, Comment, Category
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ['id', 'name']
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'description']
 
 class BidSerializer(serializers.ModelSerializer):
     vendor_name = serializers.ReadOnlyField(source='vendor.username')
@@ -42,13 +47,18 @@ class TenderSerializer(serializers.ModelSerializer):
     client_picture = serializers.SerializerMethodField()
     tags = TagSerializer(many=True, required=False)
     bid_count = serializers.ReadOnlyField()
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(), source='category', write_only=True
+    )
 
     class Meta:
         model = Tender
         fields = [
             'tender_id', 'client', 'client_name', 'client_picture', 'title', 
             'description', 'attachment', 'max_duration', 'min_budget', 
-            'max_budget', 'created_at', 'deadline', 'status', 'tags', 'bid_count'
+            'max_budget', 'created_at', 'deadline', 'status', 'tags', 'bid_count',
+            'category', 'category_id'
         ]
         read_only_fields = ['client', 'created_at', 'status']
 
@@ -57,6 +67,7 @@ class TenderSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         tags_data = validated_data.pop('tags', [])
+        category = validated_data.pop('category', None)
         tender = Tender.objects.create(**validated_data)
         
         # Handle tags
@@ -64,6 +75,10 @@ class TenderSerializer(serializers.ModelSerializer):
             tag_name = tag_data.get('name')
             tag, _ = Tag.objects.get_or_create(name=tag_name)
             tender.tags.add(tag)
+        
+        if category:
+            tender.category = category
+            tender.save()
         
         return tender
     

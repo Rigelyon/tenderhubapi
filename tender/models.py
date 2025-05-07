@@ -9,6 +9,18 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
 class Tender(models.Model):
     STATUS_CHOICES = (
         ('open', 'Open'),
@@ -34,6 +46,7 @@ class Tender(models.Model):
     deadline = models.DateField(verbose_name="Deadline")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
     tags = models.ManyToManyField(Tag, related_name='tenders', blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='tenders')
 
     class Meta:
         verbose_name = "Tender"

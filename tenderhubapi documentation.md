@@ -140,8 +140,10 @@
 ## Tenders
 
 ### Tender Management
-- `GET /api/v1/tenders/` - List all tenders (filterable by status, tags)  
+- `GET /api/v1/tenders/` - List all tenders (filterable by status, tags, category)  
   **Payload:** None  
+  **Query Parameters:**  
+  - `category`: Filter tenders by category name
 
 - `POST /api/v1/tenders/` - Create new tender (client only)  
   **Payload:**  
@@ -154,6 +156,7 @@
     "min_budget": "number",
     "max_budget": "number",
     "deadline": "YYYY-MM-DD",
+    "category_id": "integer",
     "tags": [{"name": "string"}]
   }
   ```
@@ -213,6 +216,21 @@
 ### Tags
 - `GET /api/v1/tags/` - List all available tags  
   **Payload:** None  
+
+## Categories
+
+### Category Management
+- `GET /api/v1/categories/` - List all categories  
+  **Payload:** None  
+
+- `POST /api/v1/categories/` - Create a new category (admin only)  
+  **Payload:**  
+  ```json
+  {
+    "name": "string",
+    "description": "string"
+  }
+  ```
 
 ## Projects
 
