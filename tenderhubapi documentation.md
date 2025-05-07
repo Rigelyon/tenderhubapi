@@ -2,68 +2,282 @@
 
 ## Authentication Endpoints
 
-- `POST /api/v1/auth/token/` - Obtain JWT token for authentication
-- `POST /api/v1/auth/token/refresh/` - Refresh JWT token
+- `POST /api/v1/auth/token/` - Obtain JWT token for authentication  
+  **Payload:**  
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+
+- `POST /api/v1/auth/token/refresh/` - Refresh JWT token  
+  **Payload:**  
+  ```json
+  {
+    "refresh": "string"
+  }
+  ```
 
 ## User Management
 
 ### Registration and Profile
-- `POST /api/v1/users/register/` - Register a new user (client or vendor)
-- `GET/PUT /api/v1/users/profile/` - Get or update current user profile
-- `GET/PUT /api/v1/users/client-profile/` - Get or update client profile details
-- `GET /api/v1/users/vendors/` - List all vendors
-- `GET/PUT /api/v1/users/vendors/me/` - Get or update current vendor's profile
-- `GET /api/v1/users/vendors/{id}/` - Get specific vendor profile
+- `POST /api/v1/users/register/` - Register a new user (client or vendor)  
+  **Payload:**  
+  ```json
+  {
+    "username": "string",
+    "email": "string",
+    "password": "string",
+    "password2": "string",
+    "first_name": "string",
+    "last_name": "string",
+    "user_type": "client or vendor"
+  }
+  ```
+
+- `GET/PUT /api/v1/users/profile/` - Get or update current user profile  
+  **Payload (PUT):**  
+  ```json
+  {
+    "first_name": "string",
+    "last_name": "string",
+    "profile_picture": "file",
+    "bio": "string",
+    "location": "string",
+    "language": "string"
+  }
+  ```
+
+- `GET/PUT /api/v1/users/client-profile/` - Get or update client profile details  
+  **Payload (PUT):**  
+  ```json
+  {
+    "company_name": "string",
+    "contact_number": "string",
+    "address": "string"
+  }
+  ```
+
+- `GET /api/v1/users/vendors/` - List all vendors  
+  **Payload:** None  
+
+- `GET/PUT /api/v1/users/vendors/me/` - Get or update current vendor's profile  
+  **Payload (PUT):**  
+  ```json
+  {
+    "hourly_rate": "number"
+  }
+  ```
+
+- `GET /api/v1/users/vendors/{id}/` - Get specific vendor profile  
+  **Payload:** None  
 
 ### Vendor Profile Features
-- `GET /api/v1/users/vendors/{id}/portfolios/` - List vendor's portfolio items
-- `POST /api/v1/users/vendors/{id}/add_portfolio/` - Add portfolio item to vendor profile
-- `GET /api/v1/users/vendors/{id}/certifications/` - List vendor's certifications
-- `POST /api/v1/users/vendors/{id}/add_certification/` - Add certification to vendor profile
-- `GET /api/v1/users/vendors/{id}/education/` - List vendor's education
-- `POST /api/v1/users/vendors/{id}/add_education/` - Add education to vendor profile
+- `GET /api/v1/users/vendors/{id}/portfolios/` - List vendor's portfolio items  
+  **Payload:** None  
+
+- `POST /api/v1/users/vendors/{id}/add_portfolio/` - Add portfolio item to vendor profile  
+  **Payload:**  
+  ```json
+  {
+    "title": "string",
+    "description": "string",
+    "image": "file",
+    "link": "string",
+    "date_created": "YYYY-MM-DD"
+  }
+  ```
+
+- `GET /api/v1/users/vendors/{id}/certifications/` - List vendor's certifications  
+  **Payload:** None  
+
+- `POST /api/v1/users/vendors/{id}/add_certification/` - Add certification to vendor profile  
+  **Payload:**  
+  ```json
+  {
+    "title": "string",
+    "issuing_organization": "string",
+    "issue_date": "YYYY-MM-DD",
+    "expiry_date": "YYYY-MM-DD",
+    "credential_id": "string"
+  }
+  ```
+
+- `GET /api/v1/users/vendors/{id}/education/` - List vendor's education  
+  **Payload:** None  
+
+- `POST /api/v1/users/vendors/{id}/add_education/` - Add education to vendor profile  
+  **Payload:**  
+  ```json
+  {
+    "institution": "string",
+    "degree": "string",
+    "field_of_study": "string",
+    "start_date": "YYYY-MM-DD",
+    "end_date": "YYYY-MM-DD"
+  }
+  ```
 
 ### Skills and Reviews
-- `GET /api/v1/users/skills/` - List available skills
-- `GET /api/v1/users/reviews/` - List reviews given by current user
-- `POST /api/v1/users/reviews/` - Create a new review
+- `GET /api/v1/users/skills/` - List available skills  
+  **Payload:** None  
+
+- `GET /api/v1/users/reviews/` - List reviews given by current user  
+  **Payload:** None  
+
+- `POST /api/v1/users/reviews/` - Create a new review  
+  **Payload:**  
+  ```json
+  {
+    "reviewee": "integer",
+    "rating": "integer (1-5)",
+    "comment": "string",
+    "project": "integer"
+  }
+  ```
 
 ## Tenders
 
 ### Tender Management
-- `GET /api/v1/tenders/` - List all tenders (filterable by status, tags)
-- `POST /api/v1/tenders/` - Create new tender (client only)
-- `GET /api/v1/tenders/{id}/` - Get tender details with bids and comments
-- `PUT/DELETE /api/v1/tenders/{id}/` - Update or delete tender (owner only)
+- `GET /api/v1/tenders/` - List all tenders (filterable by status, tags)  
+  **Payload:** None  
+
+- `POST /api/v1/tenders/` - Create new tender (client only)  
+  **Payload:**  
+  ```json
+  {
+    "title": "string",
+    "description": "string",
+    "attachment": "file",
+    "max_duration": "integer",
+    "min_budget": "number",
+    "max_budget": "number",
+    "deadline": "YYYY-MM-DD",
+    "tags": [{"name": "string"}]
+  }
+  ```
+
+- `GET /api/v1/tenders/{id}/` - Get tender details with bids and comments  
+  **Payload:** None  
+
+- `PUT/DELETE /api/v1/tenders/{id}/` - Update or delete tender (owner only)  
+  **Payload (PUT):**  
+  ```json
+  {
+    "title": "string",
+    "description": "string",
+    "attachment": "file",
+    "max_duration": "integer",
+    "min_budget": "number",
+    "max_budget": "number",
+    "deadline": "YYYY-MM-DD",
+    "tags": [{"name": "string"}]
+  }
+  ```
 
 ### Tender Interactions
-- `POST /api/v1/tenders/{id}/add_comment/` - Add comment to tender
-- `POST /api/v1/tenders/{id}/place_bid/` - Place bid on tender (vendor only)
-- `POST /api/v1/tenders/{id}/accept_bid/` - Accept a bid and create project (client only)
+- `POST /api/v1/tenders/{id}/add_comment/` - Add comment to tender  
+  **Payload:**  
+  ```json
+  {
+    "content": "string"
+  }
+  ```
+
+- `POST /api/v1/tenders/{id}/place_bid/` - Place bid on tender (vendor only)  
+  **Payload:**  
+  ```json
+  {
+    "amount": "number",
+    "proposal": "string",
+    "delivery_time": "integer"
+  }
+  ```
+
+- `POST /api/v1/tenders/{id}/accept_bid/` - Accept a bid and create project (client only)  
+  **Payload:**  
+  ```json
+  {
+    "bid_id": "integer"
+  }
+  ```
 
 ### Bid Management
-- `GET /api/v1/bids/` - List bids (vendors see their bids, clients see bids on their tenders)
-- `GET /api/v1/bids/{id}/` - Get specific bid details
+- `GET /api/v1/bids/` - List bids (vendors see their bids, clients see bids on their tenders)  
+  **Payload:** None  
+
+- `GET /api/v1/bids/{id}/` - Get specific bid details  
+  **Payload:** None  
 
 ### Tags
-- `GET /api/v1/tags/` - List all available tags
+- `GET /api/v1/tags/` - List all available tags  
+  **Payload:** None  
 
 ## Projects
 
 ### Project Management
-- `GET /api/v1/projects/` - List projects where user is participant
-- `GET /api/v1/projects/{id}/` - Get project details
+- `GET /api/v1/projects/` - List projects where user is participant  
+  **Payload:** None  
+
+- `GET /api/v1/projects/{id}/` - Get project details  
+  **Payload:** None  
 
 ### Project Actions
-- `POST /api/v1/projects/{id}/request_revision/` - Request revision (client only)
-- `POST /api/v1/projects/{id}/deliver_project/` - Deliver completed work (vendor only)
-- `POST /api/v1/projects/{id}/complete_project/` - Mark project as complete (client only)
-- `POST /api/v1/projects/{id}/update_price/` - Update agreed price
-- `POST /api/v1/projects/{id}/update_deadline/` - Update project deadline
+- `POST /api/v1/projects/{id}/request_revision/` - Request revision (client only)  
+  **Payload:**  
+  ```json
+  {
+    "description": "string"
+  }
+  ```
+
+- `POST /api/v1/projects/{id}/deliver_project/` - Deliver completed work (vendor only)  
+  **Payload:**  
+  ```json
+  {
+    "description": "string",
+    "attachment": "file"
+  }
+  ```
+
+- `POST /api/v1/projects/{id}/complete_project/` - Mark project as complete (client only)  
+  **Payload:**  
+  ```json
+  {
+    "description": "string"
+  }
+  ```
+
+- `POST /api/v1/projects/{id}/update_price/` - Update agreed price  
+  **Payload:**  
+  ```json
+  {
+    "new_price": "number"
+  }
+  ```
+
+- `POST /api/v1/projects/{id}/update_deadline/` - Update project deadline  
+  **Payload:**  
+  ```json
+  {
+    "new_deadline": "YYYY-MM-DD"
+  }
+  ```
 
 ### Project Activities
-- `GET /api/v1/projects/{id}/activities/` - List all activities for a project
-- `POST /api/v1/projects/{id}/activities/` - Add new activity/comment to project
+- `GET /api/v1/projects/{id}/activities/` - List all activities for a project  
+  **Payload:** None  
+
+- `POST /api/v1/projects/{id}/activities/` - Add new activity/comment to project  
+  **Payload:**  
+  ```json
+  {
+    "activity_type": "string",
+    "description": "string",
+    "attachment": "file"
+  }
+  ```
 
 ## Testing
 
