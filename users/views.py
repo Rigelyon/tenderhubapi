@@ -64,6 +64,31 @@ class VendorProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @action(detail=True, methods=['delete'])
+    def delete_portfolio(self, request, pk=None):
+        vendor = self.get_object()
+        portfolio_id = request.query_params.get('portfolio_id')
+        
+        if not portfolio_id:
+            return Response(
+                {"error": "portfolio_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            portfolio = Portfolio.objects.get(id=portfolio_id, vendor=vendor)
+        except Portfolio.DoesNotExist:
+            return Response(
+                {"error": "Portfolio not found or you don't have permission to delete it"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        portfolio.delete()
+        return Response(
+            {"message": "Portfolio deleted successfully"}, 
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
     @action(detail=True, methods=['get'])
     def certifications(self, request, pk=None):
         vendor = self.get_object()

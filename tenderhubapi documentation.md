@@ -89,6 +89,16 @@
   }
   ```
 
+- `DELETE /api/v1/users/vendors/{id}/delete_portfolio/?portfolio_id={portfolio_id}` - Delete a portfolio item  
+  **Query Parameters:**  
+  - `portfolio_id`: ID of the portfolio to delete  
+  **Response:**  
+  ```json
+  {
+    "message": "Portfolio deleted successfully"
+  }
+  ```
+
 - `GET /api/v1/users/vendors/{id}/certifications/` - List vendor's certifications  
   **Payload:** None  
 
