@@ -227,6 +227,35 @@
 - `GET /api/v1/tags/` - List all available tags  
   **Payload:** None  
 
+### Comment Management
+- `GET /api/v1/comments/` - List comments (default: comments by current user)  
+  **Payload:** None  
+  **Query Parameters:**  
+  - `tender_id`: Filter comments by tender ID
+
+- `GET /api/v1/comments/{id}/` - Get specific comment details  
+  **Payload:** None  
+
+- `POST /api/v1/comments/` - Create a new comment  
+  **Payload:**  
+  ```json
+  {
+    "tender_id": "integer",
+    "content": "string"
+  }
+  ```
+
+- `PUT /api/v1/comments/{id}/` - Update a comment (comment owner only)  
+  **Payload:**  
+  ```json
+  {
+    "content": "string"
+  }
+  ```
+
+- `DELETE /api/v1/comments/{id}/` - Delete a comment (comment owner only)  
+  **Payload:** None  
+
 ## Categories
 
 ### Category Management

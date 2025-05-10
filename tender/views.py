@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
@@ -296,3 +297,57 @@ class CategoryViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAdminUser()]
         return super().get_permissions()
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """
+        Mengambil daftar komentar:
+        1. Jika parameter tender_id disediakan, tampilkan komentar untuk tender tersebut
+        2. Jika tidak, tampilkan semua komentar yang dibuat pengguna yang login
+        """
+        user = self.request.user
+        tender_id = self.request.query_params.get('tender_id', None)
+        
+        if tender_id:
+            return Comment.objects.filter(tender__tender_id=tender_id)
+        
+        # Default: tampilkan komentar yang dibuat oleh pengguna saat ini
+        return Comment.objects.filter(user=user)
+    
+    def perform_create(self, serializer):
+        """
+        Menentukan user dan tender saat membuat komentar baru
+        """
+        tender_id = self.request.data.get('tender_id')
+        if not tender_id:
+            raise ValidationError({"tender_id": "Parameter tender_id wajib diisi"})
+            
+        tender = get_object_or_404(Tender, tender_id=tender_id)
+        serializer.save(tender=tender, user=self.request.user)
+    
+    def update(self, request, *args, **kwargs):
+        """
+        Pastikan pengguna hanya dapat mengedit komentar mereka sendiri
+        """
+        comment = self.get_object()
+        if comment.user != request.user:
+            return Response(
+                {"error": "Anda hanya dapat mengedit komentar Anda sendiri"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().update(request, *args, **kwargs)
+    
+    def destroy(self, request, *args, **kwargs):
+        """
+        Pastikan pengguna hanya dapat menghapus komentar mereka sendiri
+        """
+        comment = self.get_object()
+        if comment.user != request.user:
+            return Response(
+                {"error": "Anda hanya dapat menghapus komentar Anda sendiri"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().destroy(request, *args, **kwargs)
