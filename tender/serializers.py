@@ -45,13 +45,12 @@ class CommentSerializer(serializers.ModelSerializer):
 class TenderSerializer(serializers.ModelSerializer):
     client_name = serializers.ReadOnlyField(source='client.username')
     client_picture = serializers.SerializerMethodField()
-    tags = TagSerializer(many=True, read_only=True)
-    tags_input = serializers.ListField(
+    tags = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField()),
         write_only=True,
-        required=False,
-        source='tags'
+        required=False
     )
+    tags_data = TagSerializer(many=True, read_only=True, source='tags')
     bid_count = serializers.ReadOnlyField()
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
@@ -63,7 +62,7 @@ class TenderSerializer(serializers.ModelSerializer):
         fields = [
             'tender_id', 'client', 'client_name', 'client_picture', 'title', 
             'description', 'attachment', 'max_duration', 'min_budget', 
-            'max_budget', 'created_at', 'deadline', 'status', 'tags', 'tags_input', 'bid_count',
+            'max_budget', 'created_at', 'deadline', 'status', 'tags', 'tags_data', 'bid_count',
             'category', 'category_id'
         ]
         read_only_fields = ['client', 'created_at', 'status']
@@ -80,8 +79,9 @@ class TenderSerializer(serializers.ModelSerializer):
         for tag_data in tags_data:
             if isinstance(tag_data, dict) and 'name' in tag_data:
                 tag_name = tag_data.get('name')
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                tender.tags.add(tag)
+                if tag_name:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name)
+                    tender.tags.add(tag)
             elif isinstance(tag_data, str):
                 tag, _ = Tag.objects.get_or_create(name=tag_data)
                 tender.tags.add(tag)
@@ -91,6 +91,37 @@ class TenderSerializer(serializers.ModelSerializer):
             tender.save()
         
         return tender
+        
+    def update(self, instance, validated_data):
+        tags_data = validated_data.pop('tags', None)
+        category = validated_data.pop('category', None)
+        
+        # Update tender fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        # Update category jika ada
+        if category:
+            instance.category = category
+        
+        # Update tags jika disediakan
+        if tags_data is not None:
+            # Hapus semua tags yang ada sebelumnya
+            instance.tags.clear()
+            
+            # Tambahkan tags baru
+            for tag_data in tags_data:
+                if isinstance(tag_data, dict) and 'name' in tag_data:
+                    tag_name = tag_data.get('name')
+                    if tag_name:
+                        tag, _ = Tag.objects.get_or_create(name=tag_name)
+                        instance.tags.add(tag)
+                elif isinstance(tag_data, str):
+                    tag, _ = Tag.objects.get_or_create(name=tag_data)
+                    instance.tags.add(tag)
+        
+        instance.save()
+        return instance
     
 class TenderDetailSerializer(TenderSerializer):
     bids = BidSerializer(many=True, read_only=True)

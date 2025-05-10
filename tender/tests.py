@@ -182,6 +182,62 @@ class TestCategoryEndpoints:
         response = api_client.post(reverse('category-list'), data)
         assert response.status_code == status.HTTP_201_CREATED
         assert Category.objects.filter(name=data['name']).exists()
+    
+    def test_create_tender_with_tags(self, api_client, client_user, category):
+        api_client.force_authenticate(user=client_user)
+        tag_name1 = fake.word()
+        tag_name2 = fake.word()
+        
+        data = {
+            'title': fake.sentence(),
+            'description': fake.text(),
+            'max_duration': 30,
+            'min_budget': 1000,
+            'max_budget': 5000,
+            'deadline': fake.future_date().isoformat(),
+            'category_id': category.id,
+            'tags': [
+                {"name": tag_name1},
+                {"name": tag_name2}
+            ]
+        }
+        
+        response = api_client.post(reverse('tender-list'), data, format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        
+        # Pastikan tender berhasil dibuat
+        created_tender = Tender.objects.get(title=data['title'])
+        assert created_tender is not None
+        
+        # Pastikan tags berhasil dibuat dan terhubung ke tender
+        assert Tag.objects.filter(name=tag_name1).exists()
+        assert Tag.objects.filter(name=tag_name2).exists()
+        
+        # Verifikasi tags terhubung dengan tender
+        assert created_tender.tags.filter(name=tag_name1).exists()
+        assert created_tender.tags.filter(name=tag_name2).exists()
+        
+        # Verifikasi jumlah tag pada tender
+        assert created_tender.tags.count() == 2
+        
+    def test_get_tender_with_tags(self, api_client, client_user, category):
+        api_client.force_authenticate(user=client_user)
+        
+        # Buat tender dengan tags
+        tag1 = Tag.objects.create(name=fake.word())
+        tag2 = Tag.objects.create(name=fake.word())
+        
+        tender = Tender.objects.create(
+            client=client_user,
+            title=fake.sentence(),
+            description=fake.text(),
+            max_duration=30,
+            min_budget=1000,
+            max_budget=5000,
+            deadline=fake.future_date(),
+            category=category
+        )
+        tender.tags.add(tag1, tag2)
 
     def test_non_admin_cannot_create_category(self, api_client):
         user = User.objects.create_user(
