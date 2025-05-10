@@ -45,7 +45,13 @@ class CommentSerializer(serializers.ModelSerializer):
 class TenderSerializer(serializers.ModelSerializer):
     client_name = serializers.ReadOnlyField(source='client.username')
     client_picture = serializers.SerializerMethodField()
-    tags = TagSerializer(many=True, required=False)
+    tags = TagSerializer(many=True, read_only=True)
+    tags_input = serializers.ListField(
+        child=serializers.DictField(child=serializers.CharField()),
+        write_only=True,
+        required=False,
+        source='tags'
+    )
     bid_count = serializers.ReadOnlyField()
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
@@ -57,7 +63,7 @@ class TenderSerializer(serializers.ModelSerializer):
         fields = [
             'tender_id', 'client', 'client_name', 'client_picture', 'title', 
             'description', 'attachment', 'max_duration', 'min_budget', 
-            'max_budget', 'created_at', 'deadline', 'status', 'tags', 'bid_count',
+            'max_budget', 'created_at', 'deadline', 'status', 'tags', 'tags_input', 'bid_count',
             'category', 'category_id'
         ]
         read_only_fields = ['client', 'created_at', 'status']
@@ -72,9 +78,13 @@ class TenderSerializer(serializers.ModelSerializer):
         
         # Handle tags
         for tag_data in tags_data:
-            tag_name = tag_data.get('name')
-            tag, _ = Tag.objects.get_or_create(name=tag_name)
-            tender.tags.add(tag)
+            if isinstance(tag_data, dict) and 'name' in tag_data:
+                tag_name = tag_data.get('name')
+                tag, _ = Tag.objects.get_or_create(name=tag_name)
+                tender.tags.add(tag)
+            elif isinstance(tag_data, str):
+                tag, _ = Tag.objects.get_or_create(name=tag_data)
+                tender.tags.add(tag)
         
         if category:
             tender.category = category
