@@ -83,6 +83,13 @@ class ClientProfileSerializer(serializers.ModelSerializer):
 class VendorProfileSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
     skills = SkillSerializer(many=True, read_only=True)
+    skill_ids = serializers.PrimaryKeyRelatedField(
+        many=True, 
+        write_only=True,
+        queryset=Skill.objects.all(),
+        required=False,
+        source='skills'
+    )
     portfolios = PortfolioSerializer(many=True, read_only=True)
     certifications = CertificationSerializer(many=True, read_only=True)
     education = EducationSerializer(many=True, read_only=True)
@@ -91,7 +98,7 @@ class VendorProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = VendorProfile
-        fields = ['user', 'skills', 'hourly_rate', 'portfolios', 'certifications', 'education', 'reviews', 'average_rating']
+        fields = ['user', 'skills', 'skill_ids', 'hourly_rate', 'portfolios', 'certifications', 'education', 'reviews', 'average_rating']
     
     def get_reviews(self, obj):
         reviews = Review.objects.filter(reviewee=obj.user)

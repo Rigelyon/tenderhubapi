@@ -90,6 +90,78 @@ class VendorProfileViewSet(viewsets.ModelViewSet):
         )
     
     @action(detail=True, methods=['get'])
+    def skills(self, request, pk=None):
+        vendor = self.get_object()
+        skills = vendor.skills.all()
+        serializer = SkillSerializer(skills, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def add_skill(self, request, pk=None):
+        vendor = self.get_object()
+        
+        # Check if we're adding an existing skill or creating a new one
+        skill_id = request.data.get('id')
+        skill_name = request.data.get('name')
+        
+        if skill_id:
+            try:
+                skill = Skill.objects.get(id=skill_id)
+                vendor.skills.add(skill)
+                return Response(
+                    {"message": f"Skill '{skill.name}' added successfully"}, 
+                    status=status.HTTP_200_OK
+                )
+            except Skill.DoesNotExist:
+                return Response(
+                    {"error": "Skill not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        elif skill_name:
+            # Get or create the skill
+            skill, created = Skill.objects.get_or_create(name=skill_name)
+            # Add the skill to the vendor's profile
+            vendor.skills.add(skill)
+            return Response(
+                {"message": f"Skill '{skill.name}' added successfully", "created": created}, 
+                status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {"error": "Either 'id' or 'name' parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
+    @action(detail=True, methods=['delete'])
+    def delete_skill(self, request, pk=None):
+        vendor = self.get_object()
+        skill_id = request.query_params.get('skill_id')
+        
+        if not skill_id:
+            return Response(
+                {"error": "skill_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            skill = Skill.objects.get(id=skill_id)
+            if skill not in vendor.skills.all():
+                return Response(
+                    {"error": "This skill is not associated with your profile"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            vendor.skills.remove(skill)
+            return Response(
+                {"message": f"Skill '{skill.name}' removed successfully"}, 
+                status=status.HTTP_200_OK
+            )
+        except Skill.DoesNotExist:
+            return Response(
+                {"error": "Skill not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+    
+    @action(detail=True, methods=['get'])
     def certifications(self, request, pk=None):
         vendor = self.get_object()
         certifications = Certification.objects.filter(vendor=vendor)
@@ -104,6 +176,31 @@ class VendorProfileViewSet(viewsets.ModelViewSet):
             serializer.save(vendor=vendor)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['delete'])
+    def delete_certification(self, request, pk=None):
+        vendor = self.get_object()
+        cert_id = request.query_params.get('certification_id')
+        
+        if not cert_id:
+            return Response(
+                {"error": "certification_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            certification = Certification.objects.get(id=cert_id, vendor=vendor)
+        except Certification.DoesNotExist:
+            return Response(
+                {"error": "Certification not found or you don't have permission to delete it"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        certification.delete()
+        return Response(
+            {"message": "Certification deleted successfully"}, 
+            status=status.HTTP_204_NO_CONTENT
+        )
     
     @action(detail=True, methods=['get'])
     def education(self, request, pk=None):
@@ -120,11 +217,60 @@ class VendorProfileViewSet(viewsets.ModelViewSet):
             serializer.save(vendor=vendor)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['delete'])
+    def delete_education(self, request, pk=None):
+        vendor = self.get_object()
+        education_id = request.query_params.get('education_id')
+        
+        if not education_id:
+            return Response(
+                {"error": "education_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            education = Education.objects.get(id=education_id, vendor=vendor)
+        except Education.DoesNotExist:
+            return Response(
+                {"error": "Education record not found or you don't have permission to delete it"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        education.delete()
+        return Response(
+            {"message": "Education record deleted successfully"}, 
+            status=status.HTTP_204_NO_CONTENT
+        )
 
-class SkillViewSet(viewsets.ReadOnlyModelViewSet):
+class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
     permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [IsAuthenticated()]  # For create, update, delete - we could add IsAdminUser here if needed
+    
+    def create(self, request, *args, **kwargs):
+        # Check if skill with this name already exists
+        name = request.data.get('name')
+        if not name:
+            return Response(
+                {"error": "Skill name is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        existing_skill = Skill.objects.filter(name__iexact=name).first()
+        if existing_skill:
+            serializer = self.get_serializer(existing_skill)
+            return Response(
+                {"message": "Skill already exists", "skill": serializer.data},
+                status=status.HTTP_200_OK
+            )
+            
+        return super().create(request, *args, **kwargs)
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer

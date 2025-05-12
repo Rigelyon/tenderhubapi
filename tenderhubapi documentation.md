@@ -99,6 +99,35 @@
   }
   ```
 
+- `GET /api/v1/users/vendors/{id}/skills/` - List vendor's skills  
+  **Payload:** None  
+
+- `POST /api/v1/users/vendors/{id}/add_skill/` - Add skill to vendor profile  
+  **Payload:**  
+  ```json
+  {
+    "id": "integer",  // Optional: ID of existing skill
+    "name": "string"  // Optional: Name for new skill (if id not provided)
+  }
+  ```
+  **Response:**  
+  ```json
+  {
+    "message": "Skill 'Skill Name' added successfully",
+    "created": true  // Whether a new skill was created
+  }
+  ```
+
+- `DELETE /api/v1/users/vendors/{id}/delete_skill/?skill_id={skill_id}` - Delete a skill from vendor profile  
+  **Query Parameters:**  
+  - `skill_id`: ID of the skill to remove  
+  **Response:**  
+  ```json
+  {
+    "message": "Skill 'Skill Name' removed successfully"
+  }
+  ```
+
 - `GET /api/v1/users/vendors/{id}/certifications/` - List vendor's certifications  
   **Payload:** None  
 
@@ -114,6 +143,16 @@
   }
   ```
 
+- `DELETE /api/v1/users/vendors/{id}/delete_certification/?certification_id={certification_id}` - Delete a certification  
+  **Query Parameters:**  
+  - `certification_id`: ID of the certification to delete  
+  **Response:**  
+  ```json
+  {
+    "message": "Certification deleted successfully"
+  }
+  ```
+
 - `GET /api/v1/users/vendors/{id}/education/` - List vendor's education  
   **Payload:** None  
 
@@ -126,6 +165,16 @@
     "field_of_study": "string",
     "start_date": "YYYY-MM-DD",
     "end_date": "YYYY-MM-DD"
+  }
+  ```
+
+- `DELETE /api/v1/users/vendors/{id}/delete_education/?education_id={education_id}` - Delete an education record  
+  **Query Parameters:**  
+  - `education_id`: ID of the education record to delete  
+  **Response:**  
+  ```json
+  {
+    "message": "Education record deleted successfully"
   }
   ```
 
