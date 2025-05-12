@@ -33,14 +33,25 @@ class BidSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     user_name = serializers.ReadOnlyField(source='user.username')
     user_picture = serializers.SerializerMethodField()
+    user_type = serializers.SerializerMethodField()
     
     class Meta:
         model = Comment
-        fields = ['comment_id', 'tender', 'user', 'user_name', 'user_picture', 'content', 'created_at']
+        fields = ['comment_id', 'tender', 'user', 'user_name', 'user_picture', 'user_type', 'content', 'created_at']
         read_only_fields = ['tender', 'user']
     
     def get_user_picture(self, obj):
         return obj.user.profile_picture.url if obj.user.profile_picture else None
+    
+    def get_user_type(self, obj):
+        if obj.user.is_client and obj.user.is_vendor:
+            return "both"
+        elif obj.user.is_client:
+            return "client"
+        elif obj.user.is_vendor:
+            return "vendor"
+        else:
+            return "undefined"
 
 class TenderSerializer(serializers.ModelSerializer):
     client_name = serializers.ReadOnlyField(source='client.username')

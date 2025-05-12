@@ -278,12 +278,58 @@
 
 ### Comment Management
 - `GET /api/v1/comments/` - List comments (default: comments by current user)  
-  **Payload:** None  
   **Query Parameters:**  
   - `tender_id`: Filter comments by tender ID
+  - `user_id`: Filter comments by user ID
+  - `user_type`: Filter comments by user type ("client" or "vendor")
+  - `from_date`: Filter comments created after this date (YYYY-MM-DD)
+  - `to_date`: Filter comments created before this date (YYYY-MM-DD)
+  - `page`: Page number for pagination
+  - `page_size`: Number of items per page (default: 10)
+  
+  **Response:**  
+  ```json
+  {
+    "count": "integer",
+    "next": "string (url)",
+    "previous": "string (url)",
+    "results": [
+      {
+        "comment_id": "integer",
+        "tender": "integer",
+        "user": "integer",
+        "user_name": "string",
+        "user_picture": "string (url)",
+        "user_type": "string (client or vendor)",
+        "content": "string",
+        "created_at": "datetime"
+      }
+    ]
+  }
+  ```
+  **Status Codes:**  
+  - `200`: Comments retrieved successfully
+  - `400`: Invalid query parameters
+  - `401`: Authentication required
 
 - `GET /api/v1/comments/{id}/` - Get specific comment details  
-  **Payload:** None  
+  **Response:**  
+  ```json
+  {
+    "comment_id": "integer",
+    "tender": "integer",
+    "user": "integer",
+    "user_name": "string",
+    "user_picture": "string (url)",
+    "user_type": "string (client or vendor)",
+    "content": "string",
+    "created_at": "datetime"
+  }
+  ```
+  **Status Codes:**  
+  - `200`: Comment retrieved successfully
+  - `404`: Comment not found
+  - `401`: Authentication required
 
 - `POST /api/v1/comments/` - Create a new comment  
   **Payload:**  
@@ -293,6 +339,24 @@
     "content": "string"
   }
   ```
+  **Response:**  
+  ```json
+  {
+    "comment_id": "integer",
+    "tender": "integer",
+    "user": "integer",
+    "user_name": "string",
+    "user_picture": "string (url)",
+    "user_type": "string (client or vendor)",
+    "content": "string",
+    "created_at": "datetime"
+  }
+  ```
+  **Status Codes:**  
+  - `201`: Comment created successfully
+  - `400`: Invalid input
+  - `401`: Authentication required
+  - `403`: Not authorized to comment on this tender
 
 - `PUT /api/v1/comments/{id}/` - Update a comment (comment owner only)  
   **Payload:**  
@@ -301,9 +365,38 @@
     "content": "string"
   }
   ```
+  **Response:**  
+  ```json
+  {
+    "comment_id": "integer",
+    "tender": "integer",
+    "user": "integer",
+    "user_name": "string",
+    "user_picture": "string (url)",
+    "user_type": "string (client or vendor)",
+    "content": "string",
+    "created_at": "datetime"
+  }
+  ```
+  **Status Codes:**  
+  - `200`: Comment updated successfully
+  - `400`: Invalid input
+  - `401`: Authentication required
+  - `403`: Not authorized to update this comment
+  - `404`: Comment not found
 
 - `DELETE /api/v1/comments/{id}/` - Delete a comment (comment owner only)  
-  **Payload:** None  
+  **Response:**  
+  ```json
+  {
+    "message": "Comment deleted successfully"
+  }
+  ```
+  **Status Codes:**  
+  - `204`: Comment deleted successfully
+  - `401`: Authentication required
+  - `403`: Not authorized to delete this comment
+  - `404`: Comment not found
 
 ## Categories
 

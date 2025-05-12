@@ -8,6 +8,23 @@ from .models import Tag, Tender, Category, Comment, Bid, Project
 # Custom admin actions
 def mark_tenders_completed(modeladmin, request, queryset):
     queryset.update(status='completed')
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('comment_id', 'tender_title', 'user', 'content_preview', 'created_at')
+    list_filter = ('created_at', 'user')
+    search_fields = ('content', 'user__username', 'tender__title')
+    ordering = ('-created_at',)
+    date_hierarchy = 'created_at'
+    raw_id_fields = ('tender', 'user')
+    
+    def tender_title(self, obj):
+        return obj.tender.title
+    
+    def content_preview(self, obj):
+        return obj.content[:50] + '...' if len(obj.content) > 50 else obj.content
+    
+    tender_title.short_description = 'Tender'
+    content_preview.short_description = 'Comment'
 mark_tenders_completed.short_description = "Mark selected tenders as completed"
 
 def mark_tenders_cancelled(modeladmin, request, queryset):
