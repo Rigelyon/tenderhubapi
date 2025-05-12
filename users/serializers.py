@@ -98,7 +98,7 @@ class VendorProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = VendorProfile
-        fields = ['user', 'skills', 'skill_ids', 'hourly_rate', 'portfolios', 'certifications', 'education', 'reviews', 'average_rating']
+        fields = ['id', 'user', 'skills', 'skill_ids', 'hourly_rate', 'portfolios', 'certifications', 'education', 'reviews', 'average_rating']
     
     def get_reviews(self, obj):
         reviews = Review.objects.filter(reviewee=obj.user)
