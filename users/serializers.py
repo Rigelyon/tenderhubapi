@@ -116,3 +116,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile_picture', 'bio', 
                   'location', 'language', 'is_client', 'is_vendor']
         read_only_fields = ['id', 'email', 'is_client', 'is_vendor']
+        
+class OtherUserProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for retrieving other users' profile data with limited fields
+    """
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name', 'profile_picture', 'bio', 
+                  'location', 'language', 'is_client', 'is_vendor']
+        read_only_fields = ['id', 'username', 'first_name', 'last_name', 'profile_picture', 'bio', 
+                          'location', 'language', 'is_client', 'is_vendor']

@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     RegisterView, UserProfileView, ClientProfileView, 
-    VendorProfileViewSet, SkillViewSet, ReviewViewSet
+    VendorProfileViewSet, SkillViewSet, ReviewViewSet,
+    OtherUserProfileView, OtherClientProfileView, OtherVendorProfileView
 )
 
 router = DefaultRouter()
@@ -70,6 +71,11 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('client-profile/', ClientProfileView.as_view(), name='client-profile'),
+    
+    # New endpoints for retrieving other users' profiles
+    path('users/<int:user_id>/profile/', OtherUserProfileView.as_view(), name='other-user-profile'),
+    path('users/<int:user_id>/client-profile/', OtherClientProfileView.as_view(), name='other-client-profile'),
+    path('users/<int:user_id>/vendor-profile/', OtherVendorProfileView.as_view(), name='other-vendor-profile'),
     
     # Named URL patterns for vendor actions
     path('vendors/<pk>/', vendor_detail, name='vendor-detail'),

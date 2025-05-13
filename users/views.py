@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from .permissions import IsProfileOwnerOrReadOnly
 
 from .models import (
     User, ClientProfile, VendorProfile, Portfolio, 
@@ -12,7 +13,7 @@ from .models import (
 from .serializers import (
     UserRegistrationSerializer, UserProfileSerializer, ClientProfileSerializer,
     VendorProfileSerializer, PortfolioSerializer, CertificationSerializer,
-    EducationSerializer, ReviewSerializer, SkillSerializer
+    EducationSerializer, ReviewSerializer, SkillSerializer, OtherUserProfileSerializer
 )
 
 class RegisterView(generics.CreateAPIView):
@@ -27,12 +28,35 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+class OtherUserProfileView(generics.RetrieveAPIView):
+    """
+    API view to retrieve another user's profile information
+    """
+    serializer_class = OtherUserProfileSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        user_id = self.kwargs.get('user_id')
+        return get_object_or_404(User, id=user_id)
+
 class ClientProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ClientProfileSerializer
     permission_classes = [IsAuthenticated]
     
     def get_object(self):
         return get_object_or_404(ClientProfile, user=self.request.user)
+
+class OtherClientProfileView(generics.RetrieveAPIView):
+    """
+    API view to retrieve another client's profile information
+    """
+    serializer_class = ClientProfileSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        user_id = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id, is_client=True)
+        return get_object_or_404(ClientProfile, user=user)
 
 class VendorProfileViewSet(viewsets.ModelViewSet):
     serializer_class = VendorProfileSerializer
@@ -242,6 +266,18 @@ class VendorProfileViewSet(viewsets.ModelViewSet):
             {"message": "Education record deleted successfully"}, 
             status=status.HTTP_204_NO_CONTENT
         )
+
+class OtherVendorProfileView(generics.RetrieveAPIView):
+    """
+    API view to retrieve another vendor's profile information
+    """
+    serializer_class = VendorProfileSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        user_id = self.kwargs.get('user_id')
+        user = get_object_or_404(User, id=user_id, is_vendor=True)
+        return get_object_or_404(VendorProfile, user=user)
 
 class SkillViewSet(viewsets.ModelViewSet):
     queryset = Skill.objects.all()

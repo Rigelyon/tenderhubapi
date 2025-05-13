@@ -59,6 +59,125 @@
   }
   ```
 
+### Viewing Other Users' Profiles
+
+- `GET /api/v1/users/users/{user_id}/profile/` - View another user's basic profile information  
+  **URL Parameters:**  
+  - `user_id`: ID of the user whose profile to view  
+  **Response:**  
+  ```json
+  {
+    "id": "integer",
+    "username": "string",
+    "first_name": "string",
+    "last_name": "string",
+    "profile_picture": "string (url)",
+    "bio": "string",
+    "location": "string",
+    "language": "string",
+    "is_client": "boolean",
+    "is_vendor": "boolean"
+  }
+  ```
+  **Status Codes:**  
+  - `200`: Profile retrieved successfully
+  - `404`: User not found
+  - `401`: Authentication required
+
+- `GET /api/v1/users/users/{user_id}/client-profile/` - View another client's detailed profile  
+  **URL Parameters:**  
+  - `user_id`: ID of the client user whose profile to view  
+  **Response:**  
+  ```json
+  {
+    "user": "string (username)",
+    "company_name": "string",
+    "contact_number": "string",
+    "address": "string",
+    "reviews": [
+      {
+        "id": "integer",
+        "reviewer": "integer",
+        "reviewer_name": "string",
+        "reviewee": "integer",
+        "rating": "integer (1-5)",
+        "comment": "string",
+        "created_at": "datetime",
+        "project": "integer"
+      }
+    ]
+  }
+  ```
+  **Status Codes:**  
+  - `200`: Profile retrieved successfully
+  - `404`: User not found or user is not a client
+  - `401`: Authentication required
+
+- `GET /api/v1/users/users/{user_id}/vendor-profile/` - View another vendor's detailed profile  
+  **URL Parameters:**  
+  - `user_id`: ID of the vendor user whose profile to view  
+  **Response:**  
+  ```json
+  {
+    "id": "integer",
+    "user": "string (username)",
+    "hourly_rate": "number",
+    "skills": [
+      {
+        "id": "integer",
+        "name": "string"
+      }
+    ],
+    "portfolios": [
+      {
+        "id": "integer",
+        "title": "string",
+        "description": "string",
+        "image": "string (url)",
+        "link": "string (url)",
+        "date_created": "YYYY-MM-DD"
+      }
+    ],
+    "certifications": [
+      {
+        "id": "integer",
+        "title": "string",
+        "issuing_organization": "string",
+        "issue_date": "YYYY-MM-DD",
+        "expiry_date": "YYYY-MM-DD",
+        "credential_id": "string"
+      }
+    ],
+    "education": [
+      {
+        "id": "integer",
+        "institution": "string",
+        "degree": "string",
+        "field_of_study": "string",
+        "start_date": "YYYY-MM-DD",
+        "end_date": "YYYY-MM-DD"
+      }
+    ],
+    "reviews": [
+      {
+        "id": "integer",
+        "reviewer": "integer",
+        "reviewer_name": "string",
+        "reviewee": "integer",
+        "rating": "integer (1-5)",
+        "comment": "string",
+        "created_at": "datetime",
+        "project": "integer"
+      }
+    ],
+    "average_rating": "number"
+  }
+  ```
+  **Status Codes:**  
+  - `200`: Profile retrieved successfully
+  - `404`: User not found or user is not a vendor
+  - `401`: Authentication required
+
 - `GET /api/v1/users/vendors/` - List all vendors  
   **Payload:** None  
 
