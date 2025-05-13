@@ -14,8 +14,6 @@ class User(AbstractUser):
     is_client = models.BooleanField(default=False)
     is_vendor = models.BooleanField(default=False)
 
-    password = models.CharField(max_length=128, default='default_password')
-
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
