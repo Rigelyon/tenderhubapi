@@ -67,6 +67,7 @@ class TenderSerializer(serializers.ModelSerializer):
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), source='category', write_only=True
     )
+    tender_category_id = serializers.IntegerField(source='category.id', read_only=True)
 
     class Meta:
         model = Tender
@@ -74,7 +75,7 @@ class TenderSerializer(serializers.ModelSerializer):
             'tender_id', 'client', 'client_name', 'client_picture', 'title', 
             'description', 'attachment', 'max_duration', 'min_budget', 
             'max_budget', 'created_at', 'deadline', 'status', 'tags', 'tags_data', 'bid_count',
-            'category', 'category_id'
+            'category', 'category_id', 'tender_category_id'
         ]
         read_only_fields = ['client', 'created_at', 'status']
 
